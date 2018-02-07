@@ -1,6 +1,8 @@
 package com.example.shaimaaderbaz.habittracker.contracts;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -33,5 +35,36 @@ public class HabitDbHelper extends SQLiteOpenHelper {
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    public void insertDBHabit(int isDaily, String description) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(HabitContract.HabitEntry.COLUMN_HABIT_DAILY, isDaily);
+        values.put(HabitContract.HabitEntry.COLUMN_HABIT_DESCIPTION, description);
+        db.insert(HabitContract.HabitEntry.TABLE_NAME, null, values);
+
+
+    }
+
+    public Cursor readDBHabits() {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] projection = {
+                HabitContract.HabitEntry._ID,
+                HabitContract.HabitEntry.COLUMN_HABIT_DESCIPTION,
+                HabitContract.HabitEntry.COLUMN_HABIT_DAILY,
+
+        };
+        String sortOrder =HabitContract.HabitEntry._ID + " DESC";
+        Cursor cursor = db.query(
+                HabitContract.HabitEntry.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+        return cursor;
     }
 }

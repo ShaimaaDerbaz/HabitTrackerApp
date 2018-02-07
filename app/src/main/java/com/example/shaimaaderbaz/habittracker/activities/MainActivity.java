@@ -1,6 +1,5 @@
 package com.example.shaimaaderbaz.habittracker.activities;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+    private static final String TAG = MainActivity.class.getName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,47 +23,27 @@ public class MainActivity extends AppCompatActivity {
         String [] habits=new String[2];
         habits[0] ="playing volleyball";
         habits [1]= "walk my dog";
-        for (int i=0;i<2;i++)
-        {
-        ContentValues values = new ContentValues();
-        values.put(HabitContract.HabitEntry.COLUMN_HABIT_DESCIPTION,habits[i]);
-        values.put(HabitContract.HabitEntry.COLUMN_HABIT_DAILY, i);
-        long newRowId = db.insert(HabitContract.HabitEntry.TABLE_NAME, null, values);
-        }
 
-        SQLiteDatabase dbRead = mDbHelper.getReadableDatabase();
+        HabitDbHelper dbHelper=new HabitDbHelper(this);
+        dbHelper.insertDBHabit(0,habits[0]);
+        dbHelper.insertDBHabit(1,habits[1]);
 
-
+        Cursor cursor=dbHelper.readDBHabits();
         String[] HabitsRead = {
                 HabitContract.HabitEntry._ID,
                 HabitContract.HabitEntry.COLUMN_HABIT_DESCIPTION,
                 HabitContract.HabitEntry.COLUMN_HABIT_DAILY
               };
 
-
-        String selection = HabitContract.HabitEntry.COLUMN_HABIT_DESCIPTION + " = ?";
-        String[] selectionArgs = { habits[1] };
-
-        String sortOrder =
-                HabitContract.HabitEntry._ID + " DESC";
-
-        Cursor cursor = dbRead.query(
-                HabitContract.HabitEntry.TABLE_NAME,                     // The table to query
-                HabitsRead,                               // The columns to return
-                selection,                                // The columns for the WHERE clause
-                selectionArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        );
-        int c=cursor.getColumnCount();
         List itemIds = new ArrayList<>();
-        while(cursor.moveToNext()) {
-            long itemId = cursor.getLong(
-                    cursor.getColumnIndexOrThrow(HabitContract.HabitEntry._ID));
+        while(cursor.moveToNext())
+        {
+            long itemId = cursor.getLong(cursor.getColumnIndexOrThrow(HabitContract.HabitEntry._ID));
             itemIds.add(itemId);
+            int habit1 =cursor.getInt(0);
+            int habit2 =cursor.getInt(1);
+            int habit3 =cursor.getInt(2);
             String []itemsCol=cursor.getColumnNames();
-
 
         }
         cursor.close();
